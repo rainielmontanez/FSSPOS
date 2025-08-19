@@ -94,13 +94,13 @@ export const Calculator: React.FC<CalculatorProps> = ({ isOpen, onClose }) => {
   ];
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
       <div className="bg-white rounded-xl shadow-xl w-full max-w-sm">
-        <div className="p-4 border-b border-gray-200">
+        <div className="p-3 sm:p-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <CalculatorIcon className="w-5 h-5 text-blue-600" />
-              <h3 className="text-lg font-bold text-gray-900">Calculator</h3>
+              <h3 className="text-base sm:text-lg font-bold text-gray-900">Calculator</h3>
             </div>
             <button
               onClick={onClose}
@@ -111,16 +111,16 @@ export const Calculator: React.FC<CalculatorProps> = ({ isOpen, onClose }) => {
           </div>
         </div>
 
-        <div className="p-4">
+        <div className="p-3 sm:p-4">
           {/* Display */}
-          <div className="bg-gray-900 text-white p-4 rounded-lg mb-4 text-right">
-            <div className="text-3xl font-mono font-bold overflow-hidden">
+          <div className="bg-gray-900 text-white p-3 sm:p-4 rounded-lg mb-3 sm:mb-4 text-right">
+            <div className="text-2xl sm:text-3xl font-mono font-bold overflow-hidden">
               {display}
             </div>
           </div>
 
           {/* Buttons */}
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-4 gap-1 sm:gap-2">
             {buttons.flat().map((btn, index) => {
               const isOperator = ['÷', '×', '-', '+', '='].includes(btn);
               const isSpecial = ['C', '±', '%'].includes(btn);
@@ -147,7 +147,7 @@ export const Calculator: React.FC<CalculatorProps> = ({ isOpen, onClose }) => {
                     }
                   }}
                   className={`
-                    h-14 rounded-lg font-semibold text-lg transition-all
+                    h-12 sm:h-14 rounded-lg font-semibold text-base sm:text-lg transition-all
                     ${isZero ? 'col-span-2' : ''}
                     ${isOperator 
                       ? 'bg-blue-600 text-white hover:bg-blue-700' 

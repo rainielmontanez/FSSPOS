@@ -133,10 +133,10 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-xl font-semibold text-gray-900">Checkout</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Checkout</h2>
           <button
             onClick={handleClose}
             className="text-gray-400 hover:text-gray-600 transition-colors"
@@ -145,14 +145,14 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Order Summary */}
           <div>
-            <h3 className="font-medium text-gray-900 mb-3">Order Summary</h3>
+            <h3 className="font-medium text-gray-900 mb-3 text-sm sm:text-base">Order Summary</h3>
             <div className="space-y-2">
               {items.map((item) => (
                 <div key={item.id} className="flex justify-between text-sm">
-                  <span>{item.product.name} x{item.quantity}</span>
+                  <span className="truncate mr-2">{item.product.name} x{item.quantity}</span>
                   <span>{settings.currency_symbol}{(item.product.price * item.quantity).toFixed(2)}</span>
                 </div>
               ))}
@@ -177,7 +177,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
 
           {/* Voucher Section */}
           <div>
-            <h3 className="font-medium text-gray-900 mb-3">Discount Voucher</h3>
+            <h3 className="font-medium text-gray-900 mb-3 text-sm sm:text-base">Discount Voucher</h3>
             {appliedVoucher ? (
               <div className="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
                 <div className="flex items-center space-x-2">
@@ -202,12 +202,12 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                   type="text"
                   value={voucherCode}
                   onChange={(e) => setVoucherCode(e.target.value.toUpperCase())}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
                   placeholder="Enter voucher code"
                 />
                 <button
                   onClick={handleApplyVoucher}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
+                  className="px-3 sm:px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors text-sm sm:text-base"
                 >
                   Apply
                 </button>
@@ -220,11 +220,11 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
 
           {/* Payment Method */}
           <div>
-            <h3 className="font-medium text-gray-900 mb-3">Payment Method</h3>
+            <h3 className="font-medium text-gray-900 mb-3 text-sm sm:text-base">Payment Method</h3>
             <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={() => setPaymentMethod('cash')}
-                className={`p-3 rounded-lg border-2 flex items-center justify-center space-x-2 transition-colors ${
+                className={`p-2 sm:p-3 rounded-lg border-2 flex items-center justify-center space-x-2 transition-colors text-sm sm:text-base ${
                   paymentMethod === 'cash'
                     ? 'border-blue-500 bg-blue-50 text-blue-700'
                     : 'border-gray-200 hover:border-gray-300'
@@ -235,7 +235,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
               </button>
               <button
                 onClick={() => setPaymentMethod('ecash')}
-                className={`p-3 rounded-lg border-2 flex items-center justify-center space-x-2 transition-colors ${
+                className={`p-2 sm:p-3 rounded-lg border-2 flex items-center justify-center space-x-2 transition-colors text-sm sm:text-base ${
                   paymentMethod === 'ecash'
                     ? 'border-blue-500 bg-blue-50 text-blue-700'
                     : 'border-gray-200 hover:border-gray-300'
@@ -258,7 +258,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                   type="text"
                   value={referenceNumber}
                   onChange={(e) => setReferenceNumber(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
                   placeholder="Enter reference number"
                   required
                 />
@@ -271,7 +271,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                   type="text"
                   value={bankName}
                   onChange={(e) => setBankName(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
                   placeholder="Enter bank name"
                   required
                 />
@@ -284,7 +284,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                   type="text"
                   value={contactInfo}
                   onChange={(e) => setContactInfo(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
                   placeholder="Phone or email (optional)"
                 />
               </div>
@@ -295,7 +295,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
           <button
             onClick={handlePayment}
             disabled={isProcessing || items.length === 0}
-            className="w-full py-3 px-4 rounded-lg text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 px-4 rounded-lg text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-base"
             style={{ backgroundColor: settings.primary_color }}
           >
             {isProcessing ? (
@@ -304,7 +304,7 @@ export default function CheckoutModal({ isOpen, onClose }: CheckoutModalProps) {
                 <span>Processing...</span>
               </div>
             ) : (
-              `Process Payment - ${settings.currency_symbol}${finalTotal.toFixed(2)}`
+              <span className="text-sm sm:text-base">{`Process Payment - ${settings.currency_symbol}${finalTotal.toFixed(2)}`}</span>
             )}
           </button>
         </div>

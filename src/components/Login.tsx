@@ -25,13 +25,13 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4 sm:p-6">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
             <LogIn className="w-8 h-8 text-blue-600" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Point of Sale</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Point of Sale</h1>
           <p className="text-gray-600 mt-2">Sign in to your account</p>
         </div>
 
@@ -44,7 +44,7 @@ export const Login: React.FC = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-base"
               placeholder="Enter your email"
               required
             />
@@ -59,7 +59,7 @@ export const Login: React.FC = () => {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all pr-12"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all pr-12 text-base"
                 placeholder="Enter your password"
                 required
               />
@@ -82,7 +82,7 @@ export const Login: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-base"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
@@ -90,13 +90,13 @@ export const Login: React.FC = () => {
 
         <div className="mt-8 p-4 bg-gray-50 rounded-lg space-y-3">
           <p className="text-sm text-gray-600 mb-2">Demo Credentials:</p>
-          <div className="text-xs space-y-1">
+          <div className="text-xs sm:text-sm space-y-1">
             <div><strong>Admin:</strong> admin@pos.com / admin123</div>
             <div><strong>Employee:</strong> employee@pos.com / emp123</div>
             <div><strong>New Employees:</strong> [email] / [password set during creation]</div>
           </div>
           <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-            <div className="text-xs text-green-700">
+            <div className="text-xs sm:text-sm text-green-700">
               <p className="font-medium mb-1">Local Storage Mode</p>
               <p>All data is stored locally in your browser. New employees use the password set during creation.</p>
             </div>
