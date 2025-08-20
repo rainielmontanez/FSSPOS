@@ -132,34 +132,34 @@ export const TimeCard: React.FC = () => {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-white rounded-lg shadow-md p-4 sm:p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center space-x-3">
           <Clock className="h-6 w-6 text-blue-600" />
-          <h2 className="text-xl font-semibold text-gray-900">Time Clock</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Time Clock</h2>
         </div>
-        <div className="flex items-center space-x-2 text-sm text-gray-600">
+        <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
           <User className="h-4 w-4" />
-          <span>{user.name}</span>
+          <span className="hidden sm:inline">{user.name}</span>
         </div>
       </div>
 
       {/* Current Status */}
-      <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+      <div className="mb-6 p-4 sm:p-6 bg-gray-50 rounded-lg">
         {currentEntry ? (
           <div className="text-center">
-            <div className="text-sm text-gray-600 mb-2">Currently Clocked In</div>
-            <div className="text-3xl font-mono font-bold text-green-600 mb-2">
+            <div className="text-xs sm:text-sm text-gray-600 mb-2">Currently Clocked In</div>
+            <div className="text-2xl sm:text-3xl font-mono font-bold text-green-600 mb-2">
               {formatDuration(currentEntry.punch_in)}
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-xs sm:text-sm text-gray-500">
               Started at {formatTime(currentEntry.punch_in)}
             </div>
           </div>
         ) : (
           <div className="text-center">
-            <div className="text-sm text-gray-600 mb-2">Not Clocked In</div>
-            <div className="text-2xl font-mono font-bold text-gray-400">
+            <div className="text-xs sm:text-sm text-gray-600 mb-2">Not Clocked In</div>
+            <div className="text-xl sm:text-2xl font-mono font-bold text-gray-400">
               00:00:00
             </div>
           </div>
@@ -167,11 +167,11 @@ export const TimeCard: React.FC = () => {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex space-x-4 mb-6">
+      <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mb-6">
         {!currentEntry ? (
           <button
             onClick={handlePunchIn}
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors"
+            className="flex-1 bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors text-base"
           >
             <Play className="h-5 w-5" />
             <span>Punch In</span>
@@ -179,7 +179,7 @@ export const TimeCard: React.FC = () => {
         ) : (
           <button
             onClick={handlePunchOut}
-            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors"
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-lg flex items-center justify-center space-x-2 transition-colors text-base"
           >
             <Square className="h-5 w-5" />
             <span>Punch Out</span>
@@ -189,24 +189,24 @@ export const TimeCard: React.FC = () => {
 
       {/* Recent Entries */}
       <div>
-        <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+        <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-4 flex items-center">
           <Calendar className="h-5 w-5 mr-2" />
           Recent Entries
         </h3>
         
         {timeEntries.length === 0 ? (
-          <div className="text-center text-gray-500 py-8">
+          <div className="text-center text-gray-500 py-6 sm:py-8">
             No time entries yet. Punch in to get started!
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {timeEntries.slice(0, 5).map((entry) => (
               <div
                 key={entry.id}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                className="flex items-center justify-between p-3 sm:p-4 bg-gray-50 rounded-lg"
               >
                 <div className="flex items-center space-x-3">
-                  <div className="text-sm">
+                  <div className="text-xs sm:text-sm">
                     <div className="font-medium text-gray-900">
                       {formatDate(entry.date)}
                     </div>
@@ -216,14 +216,17 @@ export const TimeCard: React.FC = () => {
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-mono font-medium text-gray-900">
+                  <div className="font-mono font-medium text-gray-900 text-sm sm:text-base">
                     {entry.punch_out 
                       ? `${entry.total_hours?.toFixed(2)}h`
                       : formatDuration(entry.punch_in)
                     }
                   </div>
                   {!entry.punch_out && (
-                    <div className="text-xs text-green-600">Active</div>
+                    <div className="text-xs text-green-600 flex items-center space-x-1">
+                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <span>Active</span>
+                    </div>
                   )}
                 </div>
               </div>

@@ -151,13 +151,13 @@ export const Reports: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Sales Reports</h1>
-        <div className="flex items-center space-x-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Sales Reports</h1>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
           >
             <option value="today">Today</option>
             <option value="week">This Week</option>
@@ -166,7 +166,7 @@ export const Reports: React.FC = () => {
           </select>
           <button
             onClick={handleExportClick}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all flex items-center space-x-2"
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all flex items-center justify-center space-x-2"
           >
             <Download className="w-5 h-5" />
             <span>Export to Excel</span>
@@ -175,12 +175,12 @@ export const Reports: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Sales</p>
-              <p className="text-2xl font-bold text-gray-900">{settings.currency_symbol}{totalSales.toFixed(2)}</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{settings.currency_symbol}{totalSales.toFixed(2)}</p>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
               <DollarSign className="w-6 h-6 text-green-600" />
@@ -192,7 +192,7 @@ export const Reports: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Transactions</p>
-              <p className="text-2xl font-bold text-gray-900">{totalTransactions}</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{totalTransactions}</p>
             </div>
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
               <Receipt className="w-6 h-6 text-blue-600" />
@@ -204,7 +204,7 @@ export const Reports: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Avg Transaction</p>
-              <p className="text-2xl font-bold text-gray-900">{settings.currency_symbol}{avgTransaction.toFixed(2)}</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{settings.currency_symbol}{avgTransaction.toFixed(2)}</p>
             </div>
             <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-purple-600" />
@@ -213,8 +213,75 @@ export const Reports: React.FC = () => {
         </div>
       </div>
 
+      {/* Mobile Sales Cards */}
+      <div className="block lg:hidden space-y-4">
+        {sales.map(sale => (
+          <div key={sale.id} className="bg-white rounded-xl shadow-sm p-4">
+            <div className="flex items-start justify-between mb-3">
+              <div>
+                <p className="text-sm font-medium text-gray-900">
+                  {new Date(sale.created_at).toLocaleDateString()}
+                </p>
+                <p className="text-xs text-gray-500">
+                  {new Date(sale.created_at).toLocaleTimeString()}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-bold text-gray-900">
+                  {settings.currency_symbol}{sale.total.toFixed(2)}
+                </p>
+                <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                  sale.payment_method === 'cash' 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-blue-100 text-blue-800'
+                }`}>
+                  {sale.payment_method === 'cash' ? 'Cash' : 'E-Cash'}
+                </span>
+              </div>
+            </div>
+            <div className="space-y-1 mb-3">
+              {sale.items.map((item, index) => (
+                <div key={index} className="flex justify-between text-sm">
+                  <span className="text-gray-600">{item.product_name} x{item.quantity}</span>
+                  <span className="text-gray-900">{settings.currency_symbol}{(item.price * item.quantity).toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+            {sale.payment_details?.reference_number && (
+              <p className="text-xs text-gray-500 mb-3">
+                Ref: {sale.payment_details.reference_number}
+              </p>
+            )}
+            <div className="flex space-x-2 pt-3 border-t border-gray-200">
+              {canEditSale(sale.created_at) ? (
+                <>
+                  <button
+                    onClick={() => handleEditSale(sale)}
+                    className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-all flex items-center justify-center space-x-2"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    onClick={() => handleDeleteSale(sale.id, sale.created_at)}
+                    className="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-all flex items-center justify-center space-x-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Delete</span>
+                  </button>
+                </>
+              ) : (
+                <div className="flex-1 text-center py-2 text-gray-400 text-sm">
+                  24h edit period expired
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Recent Sales */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden hidden lg:block">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-lg font-bold text-gray-900">Recent Sales</h2>
         </div>
@@ -294,13 +361,13 @@ export const Reports: React.FC = () => {
 
       {/* Password Modal */}
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-            <div className="p-6">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+            <div className="p-4 sm:p-6">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-2">
                   <Lock className="w-5 h-5 text-blue-600" />
-                  <h3 className="text-lg font-bold text-gray-900">Protect Excel Export</h3>
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900">Protect Excel Export</h3>
                 </div>
                 <button
                   onClick={() => {
@@ -322,7 +389,7 @@ export const Reports: React.FC = () => {
                     type="password"
                     value={exportPassword}
                     onChange={(e) => setExportPassword(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                     placeholder="Enter a secure password"
                     required
                     minLength={4}
@@ -338,13 +405,13 @@ export const Reports: React.FC = () => {
                       setShowPasswordModal(false);
                       setExportPassword('');
                     }}
-                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all"
+                    className="flex-1 px-4 sm:px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all text-base"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"
+                    className="flex-1 px-4 sm:px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all text-base"
                   >
                     Export Excel
                   </button>
@@ -357,11 +424,11 @@ export const Reports: React.FC = () => {
 
       {/* Edit Sale Modal */}
       {showEditModal && editingSale && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-            <div className="p-6">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+            <div className="p-4 sm:p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-bold text-gray-900">Edit Sale</h3>
+                <h3 className="text-base sm:text-lg font-bold text-gray-900">Edit Sale</h3>
                 <button
                   onClick={() => {
                     setShowEditModal(false);
@@ -384,7 +451,7 @@ export const Reports: React.FC = () => {
                       ...editingSale,
                       total: parseFloat(e.target.value) || 0
                     })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                     required
                   />
                 </div>
@@ -397,7 +464,7 @@ export const Reports: React.FC = () => {
                       ...editingSale,
                       payment_method: e.target.value as 'cash' | 'ecash'
                     })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                   >
                     <option value="cash">Cash</option>
                     <option value="ecash">E-Cash</option>
@@ -417,7 +484,7 @@ export const Reports: React.FC = () => {
                           reference_number: e.target.value
                         }
                       })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                     />
                   </div>
                 )}
@@ -429,13 +496,13 @@ export const Reports: React.FC = () => {
                       setShowEditModal(false);
                       setEditingSale(null);
                     }}
-                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all"
+                    className="flex-1 px-4 sm:px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all text-base"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
+                    className="flex-1 px-4 sm:px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-base"
                   >
                     Update Sale
                   </button>

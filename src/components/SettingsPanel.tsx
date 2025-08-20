@@ -327,7 +327,7 @@ export const SettingsPanel: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+      <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Settings</h1>
       
       {/* Backup Reminder Notification */}
       {showReminderNotification && (
@@ -372,9 +372,9 @@ export const SettingsPanel: React.FC = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Logo Settings */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center space-x-2">
             <Upload className="w-5 h-5" />
             <span>Brand & Logo Settings</span>
@@ -387,7 +387,7 @@ export const SettingsPanel: React.FC = () => {
                 type="text"
                 value={brandName}
                 onChange={(e) => setBrandName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                 placeholder="Enter your business name"
                 required
               />
@@ -399,7 +399,7 @@ export const SettingsPanel: React.FC = () => {
                 type="url"
                 value={logoUrl}
                 onChange={(e) => setLogoUrl(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                 placeholder="https://example.com/logo.png"
               />
             </div>
@@ -460,7 +460,7 @@ export const SettingsPanel: React.FC = () => {
         </div>
 
         {/* Color Settings */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center space-x-2">
             <Palette className="w-5 h-5" />
             <span>Theme Settings</span>
@@ -480,7 +480,7 @@ export const SettingsPanel: React.FC = () => {
                   type="text"
                   value={primaryColor}
                   onChange={(e) => setPrimaryColor(e.target.value)}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-base"
                 />
               </div>
             </div>
@@ -494,9 +494,9 @@ export const SettingsPanel: React.FC = () => {
                     key={color}
                     onClick={() => setPrimaryColor(color)}
                     className={`w-12 h-12 rounded-lg border-2 transition-all ${
-                      primaryColor === color ? 'border-gray-400 scale-110' : 'border-gray-200 hover:border-gray-300'
+                    className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                     }`}
-                    style={{ backgroundColor: color }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                   />
                 ))}
               </div>
@@ -524,7 +524,7 @@ export const SettingsPanel: React.FC = () => {
         </div>
 
         {/* Currency Settings */}
-        <div className="bg-white rounded-xl shadow-sm p-6 lg:col-span-1">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 lg:col-span-1">
           <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center space-x-2">
             <DollarSign className="w-5 h-5" />
             <span>Currency Settings</span>
@@ -542,7 +542,7 @@ export const SettingsPanel: React.FC = () => {
                     setCurrencySymbol(selectedCurrency.symbol);
                   }
                 }}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
               >
                 {commonCurrencies.map(curr => (
                   <option key={curr.code} value={curr.code}>
@@ -558,7 +558,7 @@ export const SettingsPanel: React.FC = () => {
                 type="text"
                 value={currencySymbol}
                 onChange={(e) => setCurrencySymbol(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                 placeholder="$"
               />
             </div>
@@ -576,7 +576,7 @@ export const SettingsPanel: React.FC = () => {
 
         {/* Password Settings - Admin Only */}
         {user?.role === 'admin' && (
-          <div className="bg-white rounded-xl shadow-sm p-6 lg:col-span-1">
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 lg:col-span-1">
             <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center space-x-2">
               <Lock className="w-5 h-5" />
               <span>Security Settings</span>
@@ -609,7 +609,7 @@ export const SettingsPanel: React.FC = () => {
                         ...passwordData,
                         currentPassword: e.target.value
                       })}
-                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                       required
                     />
                     <button
@@ -704,13 +704,13 @@ export const SettingsPanel: React.FC = () => {
                       setPasswordError('');
                       setPasswordSuccess('');
                     }}
-                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all"
+                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all text-base"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all"
+                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-base"
                   >
                     Change Password
                   </button>
@@ -722,7 +722,7 @@ export const SettingsPanel: React.FC = () => {
 
         {/* Data Management - Admin Only */}
         {user?.role === 'admin' && (
-          <div className="bg-white rounded-xl shadow-sm p-6 lg:col-span-1">
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 lg:col-span-1">
             <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center space-x-2">
               <Database className="w-5 h-5" />
               <span>Data Management</span>
@@ -810,7 +810,7 @@ export const SettingsPanel: React.FC = () => {
 
         {/* Backup Reminder Settings - Admin Only */}
         {user?.role === 'admin' && (
-          <div className="bg-white rounded-xl shadow-sm p-6 lg:col-span-1">
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 lg:col-span-1">
             <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center space-x-2">
               <Bell className="w-5 h-5" />
               <span>Backup Reminders</span>
@@ -839,7 +839,7 @@ export const SettingsPanel: React.FC = () => {
                     <select
                       value={reminderFrequency}
                       onChange={(e) => setReminderFrequency(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                     >
                       <option value="daily">Daily</option>
                       <option value="weekly">Weekly</option>
@@ -897,7 +897,7 @@ export const SettingsPanel: React.FC = () => {
       <div className="flex justify-end">
         <button
           onClick={handleSave}
-          className="save-button bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all flex items-center space-x-2"
+          className="save-button bg-blue-600 text-white px-4 sm:px-6 py-3 rounded-lg hover:bg-blue-700 transition-all flex items-center space-x-2 w-full sm:w-auto justify-center"
         >
           <Save className="w-5 h-5" />
           <span>Save Settings</span>
@@ -906,13 +906,13 @@ export const SettingsPanel: React.FC = () => {
 
       {/* Import Confirmation Modal */}
       {showImportConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-            <div className="p-6">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[95vh] overflow-y-auto">
+            <div className="p-4 sm:p-6">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-2">
                   <AlertTriangle className="w-5 h-5 text-yellow-600" />
-                  <h3 className="text-lg font-bold text-gray-900">Confirm Data Import</h3>
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900">Confirm Data Import</h3>
                 </div>
                 <button
                   onClick={() => {
@@ -967,14 +967,14 @@ export const SettingsPanel: React.FC = () => {
                       setImportData(null);
                       setImportFileName('');
                     }}
-                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all"
+                    className="flex-1 px-4 sm:px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all text-base"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleImportData}
                     disabled={importLoading}
-                    className="flex-1 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all disabled:opacity-50"
+                    className="flex-1 px-4 sm:px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all disabled:opacity-50 text-base"
                   >
                     {importLoading ? 'Importing...' : 'Import Data'}
                   </button>

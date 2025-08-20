@@ -185,13 +185,13 @@ export const AttendanceReports: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Attendance Reports</h1>
-        <div className="flex items-center space-x-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Attendance Reports</h1>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <select
             value={selectedEmployee}
             onChange={(e) => setSelectedEmployee(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
           >
             <option value="all">All Employees</option>
             {uniqueEmployees.map(employee => (
@@ -201,7 +201,7 @@ export const AttendanceReports: React.FC = () => {
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
           >
             <option value="today">Today</option>
             <option value="week">This Week</option>
@@ -209,7 +209,7 @@ export const AttendanceReports: React.FC = () => {
           </select>
           <button
             onClick={handleExportClick}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all flex items-center space-x-2"
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all flex items-center justify-center space-x-2"
           >
             <Download className="w-5 h-5" />
             <span>Export to Excel</span>
@@ -218,12 +218,12 @@ export const AttendanceReports: React.FC = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Hours</p>
-              <p className="text-2xl font-bold text-gray-900">{totalHours.toFixed(1)}h</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{totalHours.toFixed(1)}h</p>
             </div>
             <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
               <Clock className="w-6 h-6 text-blue-600" />
@@ -235,7 +235,7 @@ export const AttendanceReports: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Sessions</p>
-              <p className="text-2xl font-bold text-gray-900">{totalSessions}</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{totalSessions}</p>
             </div>
             <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
               <Users className="w-6 h-6 text-green-600" />
@@ -247,7 +247,7 @@ export const AttendanceReports: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Avg Hours/Day</p>
-              <p className="text-2xl font-bold text-gray-900">{avgHoursPerDay.toFixed(1)}h</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{avgHoursPerDay.toFixed(1)}h</p>
             </div>
             <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-purple-600" />
@@ -256,8 +256,44 @@ export const AttendanceReports: React.FC = () => {
         </div>
       </div>
 
+      {/* Mobile Employee Performance Cards */}
+      <div className="block lg:hidden space-y-4">
+        <h2 className="text-lg font-bold text-gray-900">Employee Performance</h2>
+        {employeeStats.map(employee => (
+          <div key={employee.id} className="bg-white rounded-xl shadow-sm p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-medium text-gray-900">{employee.name}</h3>
+              {employee.activeSessions > 0 ? (
+                <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800 flex items-center space-x-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span>Active</span>
+                </span>
+              ) : (
+                <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+                  Offline
+                </span>
+              )}
+            </div>
+            <div className="grid grid-cols-3 gap-4 text-center">
+              <div>
+                <p className="text-lg font-bold text-gray-900">{employee.totalHours.toFixed(1)}h</p>
+                <p className="text-xs text-gray-500">Total Hours</p>
+              </div>
+              <div>
+                <p className="text-lg font-bold text-gray-900">{employee.sessions}</p>
+                <p className="text-xs text-gray-500">Sessions</p>
+              </div>
+              <div>
+                <p className="text-lg font-bold text-gray-900">{employee.avgHoursPerSession.toFixed(1)}h</p>
+                <p className="text-xs text-gray-500">Avg/Session</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Employee Performance */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden hidden lg:block">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-lg font-bold text-gray-900">Employee Performance</h2>
         </div>
@@ -305,15 +341,50 @@ export const AttendanceReports: React.FC = () => {
         </div>
       </div>
 
+      {/* Mobile Time Entries Cards */}
+      <div className="block lg:hidden space-y-4">
+        <h2 className="text-lg font-bold text-gray-900">Recent Time Entries</h2>
+        {filteredEntries.slice(-10).reverse().map(entry => (
+          <div key={entry.id} className="bg-white rounded-xl shadow-sm p-4">
+            <div className="flex items-start justify-between mb-2">
+              <div>
+                <h3 className="font-medium text-gray-900">{entry.employee_name}</h3>
+                <p className="text-sm text-gray-600">{new Date(entry.date).toLocaleDateString()}</p>
+              </div>
+              <div className="text-right">
+                {entry.total_hours ? (
+                  <span className="text-lg font-bold text-gray-900">{entry.total_hours.toFixed(1)}h</span>
+                ) : (
+                  <span className="text-green-600 font-medium flex items-center space-x-1">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span>Active</span>
+                  </span>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-sm text-gray-600">
+              <span>In: {new Date(entry.punch_in).toLocaleTimeString()}</span>
+              <span>
+                {entry.punch_out ? (
+                  `Out: ${new Date(entry.punch_out).toLocaleTimeString()}`
+                ) : (
+                  'Still working'
+                )}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Password Modal */}
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
-            <div className="p-6">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+            <div className="p-4 sm:p-6">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-2">
                   <Lock className="w-5 h-5 text-blue-600" />
-                  <h3 className="text-lg font-bold text-gray-900">Protect Excel Export</h3>
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900">Protect Excel Export</h3>
                 </div>
                 <button
                   onClick={() => {
@@ -335,7 +406,7 @@ export const AttendanceReports: React.FC = () => {
                     type="password"
                     value={exportPassword}
                     onChange={(e) => setExportPassword(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                     placeholder="Enter a secure password"
                     required
                     minLength={4}
@@ -344,8 +415,9 @@ export const AttendanceReports: React.FC = () => {
                     This password will be required to open the Excel file
                   </p>
                 </div>
-      {/* Detailed Time Entries */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+
+      {/* Desktop Detailed Time Entries */}
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden hidden lg:block">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-lg font-bold text-gray-900">Detailed Time Entries</h2>
         </div>
@@ -400,13 +472,13 @@ export const AttendanceReports: React.FC = () => {
                       setShowPasswordModal(false);
                       setExportPassword('');
                     }}
-                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all"
+                    className="flex-1 px-4 sm:px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all text-base"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"
+                    className="flex-1 px-4 sm:px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all text-base"
                   >
                     Export Excel
                   </button>
