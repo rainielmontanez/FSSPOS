@@ -3,7 +3,6 @@ import { Download, Calendar, TrendingUp, DollarSign, Receipt, Edit2, Trash2, X, 
 import { Sale } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 import { LocalStorage } from '../lib/storage';
-import * as XLSX from 'xlsx';
 
 export const Reports: React.FC = () => {
   const { settings } = useSettings();
@@ -21,7 +20,6 @@ export const Reports: React.FC = () => {
   const loadSales = async () => {
     try {
       const data = LocalStorage.load<Sale>('pos_sales');
-      // Sort by created_at descending
       data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       setSales(data);
     } catch (error) {
@@ -44,47 +42,29 @@ export const Reports: React.FC = () => {
     setShowPasswordModal(true);
   };
 
-  const downloadExcelSummary = () => {
+  const downloadCSVReport = () => {
     if (!exportPassword.trim()) {
-      alert('Please enter a password for the Excel file');
+      alert('Please enter a password for the report');
       return;
     }
 
-    const summary = {
-      date_range: dateRange,
-      total_sales: totalSales,
-      total_transactions: totalTransactions,
-      average_transaction: avgTransaction,
-      generated_at: new Date().toISOString()
-    };
-
-    // Create workbook
-    const wb = XLSX.utils.book_new();
-
-    // Summary sheet
-    const summaryData = [
-      ['Sales Report Summary'],
-      [''],
+    // Create CSV content
+    const csvContent = [
+      ['Sales Report'],
       ['Date Range:', dateRange],
       ['Total Sales:', `${settings.currency_symbol}${totalSales.toFixed(2)}`],
-      ['Total Transactions:', totalTransactions],
+      ['Total Transactions:', totalTransactions.toString()],
       ['Average Transaction:', `${settings.currency_symbol}${avgTransaction.toFixed(2)}`],
       ['Generated At:', new Date().toLocaleString()],
+      ['Password:', exportPassword],
       [''],
-      ['Password Protected by:', 'Admin User']
-    ];
-    const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(wb, summaryWs, 'Summary');
-
-    // Sales details sheet
-    const salesData = [
       ['Date', 'Time', 'Items', 'Payment Method', 'Reference', 'Total']
     ];
     
     sales.forEach(sale => {
       const date = new Date(sale.created_at);
-      const items = sale.items.map(item => `${item.product_name} x${item.quantity}`).join(', ');
-      salesData.push([
+      const items = sale.items.map(item => `${item.product_name} x${item.quantity}`).join('; ');
+      csvContent.push([
         date.toLocaleDateString(),
         date.toLocaleTimeString(),
         items,
@@ -93,29 +73,21 @@ export const Reports: React.FC = () => {
         `${settings.currency_symbol}${sale.total.toFixed(2)}`
       ]);
     });
-    
-    const salesWs = XLSX.utils.aoa_to_sheet(salesData);
-    XLSX.utils.book_append_sheet(wb, salesWs, 'Sales Details');
 
-    // Write file with password protection (note: basic protection)
-    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    
+    const csvString = csvContent.map(row => row.join(',')).join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `sales-report-${dateRange}-${new Date().toISOString().split('T')[0]}.xlsx`;
+    a.download = `sales-report-${dateRange}-${new Date().toISOString().split('T')[0]}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    // Store password info (in real app, this would be more secure)
-    localStorage.setItem(`export_password_${Date.now()}`, exportPassword);
-    
     setShowPasswordModal(false);
     setExportPassword('');
-    alert(`Excel file downloaded successfully!\nPassword: ${exportPassword}\n\nNote: Remember this password to open the file.`);
+    alert(`CSV file downloaded successfully!\nPassword included in file: ${exportPassword}`);
   };
 
   const handleEditSale = (sale: Sale) => {
@@ -150,7 +122,7 @@ export const Reports: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-0">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Sales Reports</h1>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -169,14 +141,14 @@ export const Reports: React.FC = () => {
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all flex items-center justify-center space-x-2"
           >
             <Download className="w-5 h-5" />
-            <span>Export to Excel</span>
+            <span>Export CSV</span>
           </button>
         </div>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Sales</p>
@@ -188,7 +160,7 @@ export const Reports: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Transactions</p>
@@ -200,7 +172,7 @@ export const Reports: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 sm:col-span-2 lg:col-span-1">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Avg Transaction</p>
@@ -215,6 +187,7 @@ export const Reports: React.FC = () => {
 
       {/* Mobile Sales Cards */}
       <div className="block lg:hidden space-y-4">
+        <h2 className="text-lg font-bold text-gray-900">Recent Sales</h2>
         {sales.map(sale => (
           <div key={sale.id} className="bg-white rounded-xl shadow-sm p-4">
             <div className="flex items-start justify-between mb-3">
@@ -280,7 +253,7 @@ export const Reports: React.FC = () => {
         ))}
       </div>
 
-      {/* Recent Sales */}
+      {/* Desktop Table */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden hidden lg:block">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-lg font-bold text-gray-900">Recent Sales</h2>
@@ -361,13 +334,13 @@ export const Reports: React.FC = () => {
 
       {/* Password Modal */}
       {showPasswordModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-            <div className="p-4 sm:p-6">
+            <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-2">
                   <Lock className="w-5 h-5 text-blue-600" />
-                  <h3 className="text-base sm:text-lg font-bold text-gray-900">Protect Excel Export</h3>
+                  <h3 className="text-lg font-bold text-gray-900">Export Report</h3>
                 </div>
                 <button
                   onClick={() => {
@@ -380,10 +353,10 @@ export const Reports: React.FC = () => {
                 </button>
               </div>
 
-              <form onSubmit={(e) => { e.preventDefault(); downloadExcelSummary(); }} className="space-y-4">
+              <form onSubmit={(e) => { e.preventDefault(); downloadCSVReport(); }} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Set Password for Excel File
+                    Set Password for Report
                   </label>
                   <input
                     type="password"
@@ -395,7 +368,7 @@ export const Reports: React.FC = () => {
                     minLength={4}
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    This password will be required to open the Excel file
+                    This password will be included in the CSV file
                   </p>
                 </div>
                 <div className="flex space-x-3 pt-4">
@@ -405,15 +378,15 @@ export const Reports: React.FC = () => {
                       setShowPasswordModal(false);
                       setExportPassword('');
                     }}
-                    className="flex-1 px-4 sm:px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all text-base"
+                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all text-base"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 sm:px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all text-base"
+                    className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all text-base"
                   >
-                    Export Excel
+                    Export CSV
                   </button>
                 </div>
               </form>
@@ -424,11 +397,11 @@ export const Reports: React.FC = () => {
 
       {/* Edit Sale Modal */}
       {showEditModal && editingSale && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-            <div className="p-4 sm:p-6">
+            <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-base sm:text-lg font-bold text-gray-900">Edit Sale</h3>
+                <h3 className="text-lg font-bold text-gray-900">Edit Sale</h3>
                 <button
                   onClick={() => {
                     setShowEditModal(false);
@@ -496,13 +469,13 @@ export const Reports: React.FC = () => {
                       setShowEditModal(false);
                       setEditingSale(null);
                     }}
-                    className="flex-1 px-4 sm:px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all text-base"
+                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all text-base"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 sm:px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-base"
+                    className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all text-base"
                   >
                     Update Sale
                   </button>

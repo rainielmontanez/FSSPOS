@@ -74,6 +74,16 @@
   * {
     -webkit-overflow-scrolling: touch;
   }
+  
+  /* Better spacing for mobile */
+  .space-y-6 > * + * {
+    margin-top: 1rem;
+  }
+  
+  /* Mobile-friendly modals */
+  .fixed.inset-0 {
+    padding: 0.5rem;
+  }
 }
 
 /* Tablet specific styles */
@@ -82,6 +92,11 @@
     padding-left: 1rem;
     padding-right: 1rem;
   }
+   
+   /* Tablet spacing */
+   .space-y-6 > * + * {
+     margin-top: 1.5rem;
+   }
 }
 
 /* Hide scrollbar on mobile for cleaner look */
@@ -93,5 +108,38 @@
   .overflow-y-auto {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+}
+
+/* Responsive text sizing */
+@media (max-width: 640px) {
+  h1 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+  
+  h3 {
+    font-size: 1.125rem;
+    line-height: 1.5rem;
+  }
+}
+
+/* Better mobile card layouts */
+@media (max-width: 768px) {
+  .bg-white.rounded-xl.shadow-sm {
+    margin-bottom: 1rem;
+    border-radius: 0.75rem;
+  }
+  
+  /* Mobile-friendly buttons */
+  .flex.space-x-2 button {
+    flex: 1;
+    justify-content: center;
+    padding: 0.75rem 1rem;
   }
 }

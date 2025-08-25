@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Download, Calendar, Clock, Users, TrendingUp, Filter, Lock, X } from 'lucide-react';
+import { Download, Calendar, Clock, Users, TrendingUp, Lock, X } from 'lucide-react';
 import { TimeEntry } from '../types';
 import { useSettings } from '../contexts/SettingsContext';
 import { LocalStorage } from '../lib/storage';
-import * as XLSX from 'xlsx';
 
 export const AttendanceReports: React.FC = () => {
   const { settings } = useSettings();
@@ -20,7 +19,6 @@ export const AttendanceReports: React.FC = () => {
   const loadTimeEntries = async () => {
     try {
       const data = LocalStorage.load<TimeEntry>('pos_time_entries');
-      // Sort by created_at descending
       data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
       setTimeEntries(data);
     } catch (error) {
@@ -31,12 +29,10 @@ export const AttendanceReports: React.FC = () => {
   const getFilteredEntries = () => {
     let filtered = timeEntries;
 
-    // Filter by employee
     if (selectedEmployee !== 'all') {
       filtered = filtered.filter(entry => entry.employee_id === selectedEmployee);
     }
 
-    // Filter by date range
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     
@@ -72,95 +68,60 @@ export const AttendanceReports: React.FC = () => {
     setShowPasswordModal(true);
   };
 
-  const downloadExcelReport = () => {
+  const downloadCSVReport = () => {
     if (!exportPassword.trim()) {
-      alert('Please enter a password for the Excel file');
+      alert('Please enter a password for the report');
       return;
     }
 
-    const report = {
-      date_range: dateRange,
-      employee_filter: selectedEmployee,
-      total_hours: totalHours,
-      total_sessions: totalSessions,
-      average_hours_per_day: avgHoursPerDay,
-      generated_at: new Date().toISOString()
-    };
+    const employeeStats = getEmployeeStats();
 
-    // Create workbook
-    const wb = XLSX.utils.book_new();
-
-    // Summary sheet
-    const summaryData = [
-      ['Attendance Report Summary'],
-      [''],
+    // Create CSV content
+    const csvContent = [
+      ['Attendance Report'],
       ['Date Range:', dateRange],
       ['Employee Filter:', selectedEmployee === 'all' ? 'All Employees' : uniqueEmployees.find(e => e.id === selectedEmployee)?.name || selectedEmployee],
       ['Total Hours:', `${totalHours.toFixed(1)}h`],
-      ['Total Sessions:', totalSessions],
+      ['Total Sessions:', totalSessions.toString()],
       ['Average Hours/Day:', `${avgHoursPerDay.toFixed(1)}h`],
       ['Generated At:', new Date().toLocaleString()],
+      ['Password:', exportPassword],
       [''],
-      ['Password Protected by:', 'Admin User']
-    ];
-    const summaryWs = XLSX.utils.aoa_to_sheet(summaryData);
-    XLSX.utils.book_append_sheet(wb, summaryWs, 'Summary');
-
-    // Employee performance sheet
-    const performanceData = [
-      ['Employee', 'Total Hours', 'Sessions', 'Avg Hours/Session', 'Status']
-    ];
-    
-    employeeStats.forEach(employee => {
-      performanceData.push([
-        employee.name,
-        `${employee.totalHours.toFixed(1)}h`,
-        employee.sessions,
-        `${employee.avgHoursPerSession.toFixed(1)}h`,
-        employee.activeSessions > 0 ? 'Active' : 'Offline'
-      ]);
-    });
-    
-    const performanceWs = XLSX.utils.aoa_to_sheet(performanceData);
-    XLSX.utils.book_append_sheet(wb, performanceWs, 'Employee Performance');
-
-    // Detailed entries sheet
-    const entriesData = [
-      ['Employee', 'Date', 'Punch In', 'Punch Out', 'Duration (Hours)']
-    ];
-    
-    filteredEntries.forEach(entry => {
-      entriesData.push([
+      ['Employee Performance'],
+      ['Employee', 'Total Hours', 'Sessions', 'Avg Hours/Session', 'Status'],
+      ...employeeStats.map(emp => [
+        emp.name,
+        `${emp.totalHours.toFixed(1)}h`,
+        emp.sessions.toString(),
+        `${emp.avgHoursPerSession.toFixed(1)}h`,
+        emp.activeSessions > 0 ? 'Active' : 'Offline'
+      ]),
+      [''],
+      ['Time Entries'],
+      ['Employee', 'Date', 'Punch In', 'Punch Out', 'Duration (Hours)'],
+      ...filteredEntries.map(entry => [
         entry.employee_name,
         new Date(entry.date).toLocaleDateString(),
         new Date(entry.punch_in).toLocaleTimeString(),
         entry.punch_out ? new Date(entry.punch_out).toLocaleTimeString() : 'Active',
         entry.total_hours ? `${entry.total_hours.toFixed(1)}h` : 'In Progress'
-      ]);
-    });
-    
-    const entriesWs = XLSX.utils.aoa_to_sheet(entriesData);
-    XLSX.utils.book_append_sheet(wb, entriesWs, 'Time Entries');
+      ])
+    ];
 
-    // Write file
-    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    const blob = new Blob([wbout], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    
+    const csvString = csvContent.map(row => row.join(',')).join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `attendance-report-${dateRange}-${new Date().toISOString().split('T')[0]}.xlsx`;
+    a.download = `attendance-report-${dateRange}-${new Date().toISOString().split('T')[0]}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
-    // Store password info
-    localStorage.setItem(`export_password_${Date.now()}`, exportPassword);
-    
     setShowPasswordModal(false);
     setExportPassword('');
-    alert(`Excel file downloaded successfully!\nPassword: ${exportPassword}\n\nNote: Remember this password to open the file.`);
+    alert(`CSV file downloaded successfully!\nPassword included in file: ${exportPassword}`);
   };
 
   const getEmployeeStats = () => {
@@ -184,7 +145,7 @@ export const AttendanceReports: React.FC = () => {
   const employeeStats = getEmployeeStats();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-0">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Attendance Reports</h1>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -212,14 +173,14 @@ export const AttendanceReports: React.FC = () => {
             className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all flex items-center justify-center space-x-2"
           >
             <Download className="w-5 h-5" />
-            <span>Export to Excel</span>
+            <span>Export CSV</span>
           </button>
         </div>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Hours</p>
@@ -231,7 +192,7 @@ export const AttendanceReports: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Sessions</p>
@@ -243,7 +204,7 @@ export const AttendanceReports: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 sm:col-span-2 lg:col-span-1">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Avg Hours/Day</p>
@@ -292,7 +253,7 @@ export const AttendanceReports: React.FC = () => {
         ))}
       </div>
 
-      {/* Employee Performance */}
+      {/* Desktop Employee Performance Table */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden hidden lg:block">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-lg font-bold text-gray-900">Employee Performance</h2>
@@ -376,46 +337,6 @@ export const AttendanceReports: React.FC = () => {
         ))}
       </div>
 
-      {/* Password Modal */}
-      {showPasswordModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-            <div className="p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center space-x-2">
-                  <Lock className="w-5 h-5 text-blue-600" />
-                  <h3 className="text-base sm:text-lg font-bold text-gray-900">Protect Excel Export</h3>
-                </div>
-                <button
-                  onClick={() => {
-                    setShowPasswordModal(false);
-                    setExportPassword('');
-                  }}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <form onSubmit={(e) => { e.preventDefault(); downloadExcelReport(); }} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Set Password for Excel File
-                  </label>
-                  <input
-                    type="password"
-                    value={exportPassword}
-                    onChange={(e) => setExportPassword(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                    placeholder="Enter a secure password"
-                    required
-                    minLength={4}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    This password will be required to open the Excel file
-                  </p>
-                </div>
-
       {/* Desktop Detailed Time Entries */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden hidden lg:block">
         <div className="p-6 border-b border-gray-200">
@@ -465,6 +386,46 @@ export const AttendanceReports: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Password Modal */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-2">
+                  <Lock className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-lg font-bold text-gray-900">Export Report</h3>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowPasswordModal(false);
+                    setExportPassword('');
+                  }}
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <form onSubmit={(e) => { e.preventDefault(); downloadCSVReport(); }} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Set Password for Report
+                  </label>
+                  <input
+                    type="password"
+                    value={exportPassword}
+                    onChange={(e) => setExportPassword(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                    placeholder="Enter a secure password"
+                    required
+                    minLength={4}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    This password will be included in the CSV file
+                  </p>
+                </div>
                 <div className="flex space-x-3 pt-4">
                   <button
                     type="button"
@@ -472,15 +433,15 @@ export const AttendanceReports: React.FC = () => {
                       setShowPasswordModal(false);
                       setExportPassword('');
                     }}
-                    className="flex-1 px-4 sm:px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all text-base"
+                    className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all text-base"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 sm:px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all text-base"
+                    className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all text-base"
                   >
-                    Export Excel
+                    Export CSV
                   </button>
                 </div>
               </form>

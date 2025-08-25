@@ -70,53 +70,24 @@ export const SettingsPanel: React.FC = () => {
     if (!reminderSettings) return;
     
     const settings = JSON.parse(reminderSettings);
-    if (!settings.enabled) return;
+      alert('Please enter a password for the report');
     
     const lastBackup = localStorage.getItem('last_backup_date');
     if (!lastBackup) {
-      setShowReminderNotification(true);
-      return;
-    }
-    
-    const lastBackupDate = new Date(lastBackup);
-    const now = new Date();
-    const daysDiff = Math.floor((now.getTime() - lastBackupDate.getTime()) / (1000 * 60 * 60 * 24));
-    
-    let shouldRemind = false;
-    switch (settings.frequency) {
-      case 'daily':
-        shouldRemind = daysDiff >= 1;
-        break;
-      case 'weekly':
+    // Create CSV content
+    const csvContent = [
+      ['System Data Export'],
         shouldRemind = daysDiff >= 7;
-        break;
-      case 'monthly':
-        shouldRemind = daysDiff >= 30;
-        break;
     }
-    
-    if (shouldRemind) {
+      ['Password:', exportPassword],
+      ['Export Type:', 'Complete System Backup'],
+      [''],
+      ['Settings'],
+      ['Brand Name:', settings.brand_name],
+      ['Primary Color:', settings.primary_color],
+      ['Currency:', settings.currency],
+      ['Currency Symbol:', settings.currency_symbol]
       setShowReminderNotification(true);
-    }
-  };
-
-  const saveReminderSettings = () => {
-    const settings = {
-      enabled: backupReminderEnabled,
-      frequency: reminderFrequency,
-      time: reminderTime
-    };
-    localStorage.setItem('backup_reminder_settings', JSON.stringify(settings));
-  };
-
-  const handleSave = () => {
-    updateSettings({
-      logo_url: logoUrl || undefined,
-      brand_name: brandName,
-      primary_color: primaryColor,
-      currency,
-      currency_symbol: currencySymbol,
-    });
     
     // Save reminder settings
     saveReminderSettings();
@@ -710,9 +681,9 @@ export const SettingsPanel: React.FC = () => {
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all text-base"
+                    className="flex-1 px-4 sm:px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all text-base"
                   >
-                    Change Password
+                    Export CSV
                   </button>
                 </div>
               </form>
@@ -755,10 +726,10 @@ export const SettingsPanel: React.FC = () => {
                   <button
                     onClick={handleExportData}
                     disabled={exportLoading}
-                    className="export-data-button bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all flex items-center space-x-2 disabled:opacity-50"
+                    className="export-data-button bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all flex items-center space-x-2 disabled:opacity-50 text-sm sm:text-base"
                   >
                     <Download className="w-4 h-4" />
-                    <span>{exportLoading ? 'Exporting...' : 'Export All Data'}</span>
+                    <span>{exportLoading ? 'Exporting...' : 'Export CSV'}</span>
                   </button>
                 </div>
 
@@ -790,7 +761,7 @@ export const SettingsPanel: React.FC = () => {
                       className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all flex items-center space-x-2 cursor-pointer inline-flex"
                     >
                       <FileUp className="w-4 h-4" />
-                      <span>Select Backup File</span>
+                     <span>Select CSV File</span>
                     </label>
                   </div>
                 </div>
@@ -912,7 +883,7 @@ export const SettingsPanel: React.FC = () => {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-2">
                   <AlertTriangle className="w-5 h-5 text-yellow-600" />
-                  <h3 className="text-base sm:text-lg font-bold text-gray-900">Confirm Data Import</h3>
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900">Export System Data</h3>
                 </div>
                 <button
                   onClick={() => {
@@ -956,7 +927,7 @@ export const SettingsPanel: React.FC = () => {
                     <p className="text-sm text-gray-600">
                       <strong>Version:</strong> {importData.version}
                     </p>
-                  )}
+                    This password will be included in the CSV file
                 </div>
 
                 <div className="flex space-x-3 pt-4">
